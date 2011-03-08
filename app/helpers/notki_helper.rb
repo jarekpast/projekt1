@@ -1,0 +1,2 @@
+module NotkiHelper
+end

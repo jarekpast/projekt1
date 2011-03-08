@@ -1,0 +1,12 @@
+<h1>Editing notka</h1>
+
+<% form_for(@notka) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @notka %> |
+<%= link_to 'Back', notki_path %>

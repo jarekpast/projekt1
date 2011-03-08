@@ -1,0 +1,25 @@
+<h1>Spis notek</h1>
+
+<table>
+  <tr>
+  	<% for column in Notka.content_columns %>
+	<th> <%= column.human_name %></th>
+	<% end %>
+  </tr>
+
+<% #@notki.each do |notka| %>
+<% for notka in @notki %>
+  <tr>
+  	<% for column in Notka.content_columns %>
+	<td> <%=h notka.send( column.name ) %></td>
+	<% end %>
+    <td><%= link_to 'Pokaż', notka %></td>
+    <td><%= link_to 'Edytuj', edit_notka_path(notka) %></td>
+    <td><%= link_to 'Usuń', notka, :confirm => 'Czy na pweno usunąć?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'Nowa notka', new_notka_path %>

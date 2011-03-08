@@ -1,0 +1,18 @@
+<h1>Spis notek</h1>
+
+<table>
+  <tr>
+  </tr>
+
+<% @notki.each do |notka| %>
+  <tr>
+    <td><%= link_to 'Pokaż', notka %></td>
+    <td><%= link_to 'Edytuj', edit_notka_path(notka) %></td>
+    <td><%= link_to 'Usuń', notka, :confirm => 'Czy na pweno usunąć?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'Nowa notka', new_notka_path %>

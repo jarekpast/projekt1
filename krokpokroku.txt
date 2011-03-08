@@ -1,0 +1,72 @@
+I. przykładowy projekt w RadRails
+
+1. prawy klawisz myszy -> New-> RadRails project, wpisujemy nazwe projektu, np projekt1 i wybieramy baze danych mysql, naciskamy Finish
+2. odpali sie serwer i pojawi sie strona domyślna (z index)
+3. zainstalować mysql'a, np. poleceniem sudo apt-get install mysql-server
+4. utworzyc baze danych, Rails'y wymagają aby nazwa bazy była złożona z "nazwa projektu"_development czyli projekt1_development
+    mysql -u root -p
+    wpisujemy hasło dostępu
+    create database projekt1_development
+    baza jest gotowa, strukture bazy bedziemy tworzyc za pomoca migracji
+5. zagladamy do pliku projekt1/config/database.yml jest to plik konfiguracyjny dostępu do bazy, sprawdzamy czy są wszystkie dane i czy sa one prawidłowe
+    development:	- baza rozwojowa
+      adapter: mysql
+      encoding: utf8
+      reconnect: false
+      database: projekt1_development	- nazwa bazy
+      pool: 5
+      username: root	- uzytkownik bazy
+      password: 	- haslo uzytkownika
+      socket: /var/run/mysqld/mysqld.sock
+      host: localhost	- adres maszyny z bazą, u nas localhost
+6. tworzymy plik migracji, czyli zmieniamy strukture bazy za pomoca Rails'ów
+    wybieramy zakładkę Generators (obok Console i Servers) jesli jej tam nie ma to idziemy do Window -> Show view -> Generators
+    z pola Generator wybieramy migration, a obok w Parameters wpisujemy stworz_notke, zaznaczmy opcję Create i naciskamy zieloną strzałke
+7. w katalogu projekt1/db/migrate pojawił sie plik nrwersji_stworz_notke.rb, gdzie nrwersji to nr generowany przez Rails'y podczas tworzenia pliku
+    jest w nim klasa z 2 pustymi funkcajmi up i down, należy do nich dopisać to co chcemy zrobić w bazie. Chcemy zrobić tabele "notki" z 2 kolumnami "tytul" i "tresc"
+    do funkcji up dopisujemy:
+    create_table "notki" do |t|
+      t.column "tytul", :string 
+      t.column "tresc", :text 
+    end 
+    a do down:
+    drop_table "notki" 
+8. teraz bedziemy generowac strukture bazy za pomoca zadania rake'a
+    idziemy do zakładki RakeTasks i tam wybieramy task db:migrate, Parameters zostawiamy puste i naciskamy zieloną strzałke
+9. struktura bazy gotowa - mamy nowy plik projekt1/db/schema.rb, można też sprawdzić jakims narzędziem jak nasza baza wyglada, mozemy tym narzedziem dodac jakąs notke
+    lub usunąć ją z bazy, ale nam chodzi o to aby to robiła nasza strona internetowa która tu tworzymy
+10. teraz zrobimy obsługę bazy przez nasza strone - chodzi o dodawanie, usuwanie, edytowanie itp. notek w bazie danych przez nasza strone internetową
+    w tym celu generujemy za pomocą Rails'ów tzw. rusztowanie, generator rusztowania opiera sie jednak na angielskich nazwach i posługuje sie ich liczbami mnogimi podczas
+    operacji na bazie danych czyli ze słowa notka zrobiłby słowo notkas, a my nie mamy w bazie nabeli notkas tylko notki i dlatego musimy dopisac wyjątek do pliku
+    projekt1/config/initializers/inflections.rb. Należy pdremować linie 5, 8 i 10, a w linii 8 wpisać nasz wyjatek zamieniajacy "notka" na "notki" teraz Rails'y będ
+    interpretowac wyjątki liczby mnogiej w tym dla słowa notka. Teraz bedziemy generowac rusztowanie do obslugi bazy: z zakladki Generators wybieramy scaffold, a w Parameters
+    wpisujemy notka, zaznaczmy opcje Create i naciskamy zieloną strzałke.
+11. obsługa bazy przez nasza strone jest gotowa, można ją jednak poprawiać. Na razie uruchommy serwer i zobaczmy co jest pod adresem http://localhost:3000/notki/
+    nie wyglada to najlepiej, bo nie widac nazw kolumn i treści notek, ani nie można ich edytować !!!należy to naprawić i dopracować!!!
+12. na koniec możemy jeszcze spolszczyć napisy na naszej srtronie, zmieniamy je w pliku projekt1/app/controllers/notki_controller.rb i w plikach widoków w katalogu 
+    projekt1/app/views/notki po czym odswieżamy strone i widzimy zmany
+
+
+II naprawa powyższego przykładowego projektu
+
+1. wyswietlenie nazw kolumn - w pliku index.html.erb dopisać wyswietlenie pierwszego wiersza tabeli:
+	<table>
+	  <tr>
+		<% for column in Notka.content_columns %>
+		<th> <%= column.human_name %></th>
+		<% end %>
+	  </tr>
+    wyglada na to, że model Notka pozwala dostać się do bazy, a składowa @notki kontrolera NotkiControler jest tablicą do której kontroler odczytuje wszystkie notki z bazy.
+2. wyswietlenie danych z wpisow - w tym samym pliku nalezy dokończyć tabele w następujący sposób:
+	<% for notka in @notki %>
+	  <tr>
+		<% for column in Notka.content_columns %>
+		<td> <%=h notka.send( column.name ) %></td>
+		<% end %>
+	    <td><%= link_to 'Pokaż', notka %></td>
+	    <td><%= link_to 'Edytuj', edit_notka_path(notka) %></td>
+	    <td><%= link_to 'Usuń', notka, :confirm => 'Czy na pweno usunąć?', :method => :delete %></td>
+	  </tr>
+	<% end %>
+	</table>
+3. obsługa linku Pokaż

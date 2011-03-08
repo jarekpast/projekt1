@@ -1,0 +1,14 @@
+<table>
+  <tr>
+  	<% for column in Notka.content_columns %>
+	<th> <%= column.human_name %></th>
+	<% end %>
+  </tr>
+  <tr>
+  	<% for ceel in @notka %>
+	<td> <%=h ceel %></td>
+	<% end %>
+  </tr>
+</table>
+<%= link_to 'Edytuj', edit_notka_path(@notka) %> |
+<%= link_to 'Wróć', notki_path %>

@@ -1,0 +1,14 @@
+<h1>Edycja notki</h1>
+
+<% form_for(@notka) do |f| %>
+  <%= f.error_messages %>
+  <%= f.text_field :tytul%>
+  <%= f.text_field :tresc%>
+
+  <p>
+    <%= f.submit 'Aktualizuj' %>
+  </p>
+<% end %>
+
+<%= link_to 'Pokaż', @notka %> |
+<%= link_to 'Wróć', notki_path %>
